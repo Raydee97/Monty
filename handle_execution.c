@@ -1,45 +1,52 @@
 #include "monty.h"
-
 /**
-  * handle_execution - Manages the operations to be executed by the interpreter
-  * @op_code: The operation code to manage
-  * @op_param: The parameter of the instruction
-  * @line: The line on which the error occurred
-  * @m: The method to be used by the interpreter
-  *
-  * Return: 0 if the operation was executed correctly or errcode if is invalid
-  */
-int handle_execution(char *op_code, char *op_param, unsigned int line, int m)
+* execute - executes the opcode
+* @stack: head linked list - stack
+* @counter: line_counter
+* @file: poiner to monty file
+* @content: line content
+* Return: no return
+*/
+int execute(char *content, stack_t **stack, unsigned int counter, FILE *file)
 {
-	int status_op = 0;
-	void (*oprt)(stack_t **, unsigned int);
+	instruction_t opst[] = {
+				{"push", f_push}, {"pall", f_pall}, {"pint", f_pint},
+				{"pop", f_pop},
+				{"swap", f_swap},
+				{"add", f_add},
+				{"nop", f_nop},
+				{"sub", f_sub},
+				{"div", f_div},
+				{"mul", f_mul},
+				{"mod", f_mod},
+				{"pchar", f_pchar},
+				{"pstr", f_pstr},
+				{"rotl", f_rotl},
+				{"rotr", f_rotr},
+				{"queue", f_queue},
+				{"stack", f_stack},
+				{NULL, NULL}
+				};
+	unsigned int i = 0;
+	char *op;
 
-	if (strcmp(op_code, "stack") == 0)
-		return (METH_STACK);
-	else if (strcmp(op_code, "queue") == 0)
-		return (METH_QUEUE);
-
-	oprt = pick_func(op_code);
-	if (oprt)
+	op = strtok(content, " \n\t");
+	if (op && op[0] == '#')
+		return (0);
+	bus.arg = strtok(NULL, " \n\t");
+	while (opst[i].opcode && op)
 	{
-		if (strcmp(op_code, "push") == 0)
-		{
-			status_op = check_push_param(op_param);
-			if (status_op == ERR_PUSH_USG)
-				return (ERR_PUSH_USG);
-
-			if (m != 0 && m == METH_QUEUE)
-				oprt = pick_func("push_queue");
-
-			oprt(&head, atoi(op_param));
+		if (strcmp(op, opst[i].opcode) == 0)
+		{	opst[i].f(stack, counter);
+			return (0);
 		}
-		else
-		{
-			oprt(&head, line);
-		}
-
-		return (m);
+		i++;
 	}
-
-	return (ERR_BAD_INST);
+	if (op && opst[i].opcode == NULL)
+	{ fprintf(stderr, "L%d: unknown instruction %s\n", counter, op);
+		fclose(file);
+		free(content);
+		free_stack(*stack);
+		exit(EXIT_FAILURE); }
+	return (1);
 }

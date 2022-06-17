@@ -1,21 +1,13 @@
 #include "monty.h"
-
 /**
-  * count_stack - Counts the number of elements in the stack
-  * @stack: The stack to count
-  *
-  * Return: Number of elements in the stack
-  */
-unsigned int count_stack(stack_t *stack)
+ * f_stack - prints the top
+ * @head: stack head
+ * @counter: line_number
+ * Return: no return
+*/
+void f_stack(stack_t **head, unsigned int counter)
 {
-	stack_t *current = stack;
-	unsigned int lenght = 0;
-
-	while (current != NULL)
-	{
-		++lenght;
-		current = current->next;
-	}
-
-	return (lenght);
+	(void)head;
+	(void)counter;
+	bus.lifi = 0;
 }
